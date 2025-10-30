@@ -1,0 +1,14 @@
+# Ignore compiled Java classes
+*.class
+
+# Common build folders
+/bin/
+/out/
+/target/
+
+# IDE/editor files
+.vscode/
+*.log
+
+# Generated files
+test.txt

@@ -5,7 +5,7 @@ import java.net.*;
 import java.util.Scanner;
 import java.util.ArrayList;
 
-public class Book {
+class Book {
     private String title;
     private ArrayList<String> text = new ArrayList<String>();
 
@@ -49,44 +49,76 @@ public class Book {
     public void readFromString(String title, String string) {
         // load a book from an input string.
         this.title = title;
+        if (string == null || string.isEmpty()) {
+            return;
+        }
 
-        // TODO: use Scanner to populate the book
-        // use: text.add(line) to add a line to the book.
+        // Split on newline characters and add each line to the book
+        String[] lines = string.split("\r?\n");
+        for (String line : lines) {
+            text.add(line);
+        }
     }
 
     public void readFromUrl(String title, String url) {
         // load a book from a URL.
-        // https://docs.oracle.com/javase/tutorial/networking/urls/readingURL.html
         this.title = title;
+        // clear previous contents
+        text.clear();
 
+        java.net.URL u = null;
+        java.net.HttpURLConnection conn = null;
         try {
-            URL bookUrl = URI.create(url).toURL();
-            // TODO: use Scanner to populate the book
-            // Scanner can open a file on a URL like this:
-            // Scanner(bookUrl.openStream())
-            // use: text.add(line) to add a line to the book.
-        } catch (IOException ex) {
-            ex.printStackTrace();
+            u = new java.net.URL(url);
+            conn = (java.net.HttpURLConnection) u.openConnection();
+            // Use a browser-like user agent to avoid some servers rejecting the default Java UA
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; PigLatinTranslator/1.0)");
+            conn.setInstanceFollowRedirects(true);
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(15000);
+
+            int code = conn.getResponseCode();
+            if (code >= 200 && code < 300) {
+                try (java.io.BufferedReader br = new java.io.BufferedReader(
+                        new java.io.InputStreamReader(conn.getInputStream(), java.nio.charset.StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        text.add(line);
+                    }
+                }
+            } else {
+                System.err.println("Failed to fetch URL: " + url + " -> HTTP " + code);
+            }
+        } catch (Exception ex) {
+            // Print error but do not throw; caller can check getLineCount()
+            System.err.println("Error reading URL: " + url + " -> " + ex.getMessage());
+        } finally {
+            if (conn != null) conn.disconnect();
         }
     }
 
     void writeToFile(String name) {
-        // TODO: Add code here to write the contents of the book to a file.
-        // Must write to file using provided name.
+        // Write the contents of the book to a file (one line per entry).
+        try (java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter(name))) {
+            for (String line : text) {
+                writer.write(line == null ? "" : line);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void addPage(String translatedPage) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addPage'");
+        // Add a translated page/line to the book
+        text.add(translatedPage);
     }
 
     public String getPage(int i) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getPage'");
+        return (i >= 0 && i < text.size()) ? text.get(i) : null;
     }
 
     public int size() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'size'");
+        return text.size();
     }
 }

@@ -1,6 +1,8 @@
 package piglatin;
 
-public class App {
+class App {
+    
+
     public static void main(String[] args)
     {
         /*  Introduction and TODO List
@@ -31,12 +33,15 @@ public class App {
             // Starter book
             Book input = new Book();
 
-            // Start with a "test" book based on a string.
-            // Get this to work, and all the tests to pass first.
-            input.readFromString("TestBook", "Dog\nCat\nMouse");
+            // Try reading from the remote URL first (preferred).
+            String remoteUrl = "https://gutenberg.pglaf.org/cache/epub/77131/pg1513.txt";
+            input.readFromUrl("Drug Themes In Science Fiction", remoteUrl);
 
-            // Example reading from a URL
-            //input.readFromUrl("Romeo and Juliette", "https://gutenberg.pglaf.org/cache/epub/1513/pg1513.txt");
+            // If the remote fetch failed or returned no lines, fall back to a local small sample
+            if (input.getLineCount() == 0) {
+                System.out.println("Could not load remote book; using a local sample instead.");
+                input.readFromString("TestBook", "Dog\nCat\nMouse");
+            }
 
             input.printlines(0,2);
             Book output = PigLatinTranslator.translate(input);
