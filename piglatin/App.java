@@ -33,9 +33,10 @@ class App {
             // Starter book
             Book input = new Book();
 
-            // Try reading from the remote URL first (preferred).
-            String remoteUrl = "https://gutenberg.pglaf.org/cache/epub/77131/pg1513.txt";
-            input.readFromUrl("Drug Themes In Science Fiction", remoteUrl);
+                // Try reading from the remote plain-text URL first (preferred).
+                // Use Project Gutenberg's plain text file to avoid translating HTML markup.
+                String remoteUrl = "https://www.gutenberg.org/cache/epub/77131/pg77131.txt";
+            input.readFromUrl("Drug themes in science fiction", remoteUrl);
 
             // If the remote fetch failed or returned no lines, fall back to a local small sample
             if (input.getLineCount() == 0) {

@@ -24,8 +24,14 @@ public static Book translate(Book input) {
 public static String translate(String input) {
     System.out.println("  -> translate('" + input + "')");
 
-    if (input == null || input.isEmpty())
-        return input;
+        if (input == null || input.isEmpty())
+            return input;
+
+        // If the line looks like HTML (contains tags), don't translate it —
+        // return it verbatim so markup is preserved.
+        if (input.indexOf('<') >= 0 && input.indexOf('>') >= 0) {
+            return input;
+        }
 
     String[] words = input.split(" ");
     StringBuilder result = new StringBuilder();
@@ -39,14 +45,19 @@ public static String translate(String input) {
 
 // A single word is translated into Pig Latin by
 private static String translateWord(String word) {
-    if (word.length() == 0)
-        return word;
+    if (word == null || word.length() == 0)
+        return (word == null) ? null : word;
 
     // Handle punctuation
     String punctuation = "";
     if (!Character.isLetter(word.charAt(word.length() - 1))) {
         punctuation = word.substring(word.length() - 1);
         word = word.substring(0, word.length() - 1);
+        // If removing trailing punctuation produced an empty word (e.g. token was only
+        // punctuation), return the punctuation unchanged to avoid index errors below.
+        if (word.length() == 0) {
+            return punctuation;
+        }
     }
 
     // Find the first vowel

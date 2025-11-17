@@ -65,6 +65,7 @@ class Book {
         this.title = title;
         // clear previous contents
         text.clear();
+        
 
         java.net.URL u = null;
         java.net.HttpURLConnection conn = null;
