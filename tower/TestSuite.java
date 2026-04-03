@@ -20,7 +20,7 @@ public class TestSuite {
         // Part 1: Model
         TowerModel tiny = new TowerModel(2);
         // Check height
-        expectEqual(tiny.getHeight(), 2, "height should be 1");
+        expectEqual(tiny.height(), 2, "height should be 1");
 
         IntegerStack[] towers = tiny.getTowers();
         // Check initial state
